@@ -11,7 +11,7 @@ library(BART)          # bart
 library(BayesPPR)      # bppr: devtools::github_install("gqcollins/BayesPPR")
 library(gplite)        # FITC (inducing point GP)
 library(tgp)           # bcart
-source("piston.R")     # piston function
+source("R/piston.R")     # piston function
 
 
 # SIMULATION SETTINGS
@@ -269,12 +269,12 @@ for(i in 1:7){
 
 
 my_tab[,3] <- my_tab[,3]*60 #RMSPE NOW HAS AN INTERPRETATION FOR UNITS OF MINUTES INSTEAD OF SECONDS
-save(my_tab, file=paste0("my_tab_", N, ".rda"))
+save(my_tab, file=paste0("Data/my_tab_", N, ".rda"))
 
 
 # SAVE LATEX OUTPUT
 # =============================================
-sink(file=paste0("table_", N, ".txt"))
+sink(file=paste0("Data/table_", N, ".txt"))
 tmp = stargazer(my_tab, digits=2)
 sink()
 
@@ -289,7 +289,7 @@ par(mar=c(9,4,2.5,2) + 0.1)
 tmp <- my_tab[,3]
 ord <- order(tmp)
 plot(1:length(tmp), tmp[ord], type='h', xaxt='n', ylab='RMSPE', xlab="", col='white',
-     xlim=c(.5, length(tmp)+0.5), ylim=c(0, 0.6))
+     xlim=c(.5, length(tmp)+0.5))
 axis(1, 1:length(tmp), rownames(my_tab)[ord], las=2)
 eps <- 0.4
 bob <- rep("black", 14)

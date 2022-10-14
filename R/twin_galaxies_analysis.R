@@ -2,7 +2,7 @@ library(lhs)              # Latin hypercube sampling
 library(tictoc)           # Timing
 library(quack)            # leapGP: devtools::install_github("knrumsey/quack")
 library(laGP)             # laGP
-source("twin_galaxies.R") # twin_galaxies function
+source("R/twin_galaxies.R") # twin_galaxies function
 
 
 # Simulations using Twin Galaxies function

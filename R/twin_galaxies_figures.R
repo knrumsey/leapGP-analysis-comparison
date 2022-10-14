@@ -1,5 +1,5 @@
 # source("R/twin_galaxies_analysis.R")    # Run twin_galaxies_analysis.R first
-source("image_scale.R")                   # Color bar for image
+source("R/image_scale.R")                   # Color bar for image
 library(RColorBrewer)                     # R Colors
 library(plotrix)                          # For plotting circles
 
