@@ -1,0 +1,62 @@
+library(quack)
+library(BASS)
+library(BART)
+library(laGP)
+library(fasterize)
+library(raster)
+library(RColorBrewer)
+
+load("surge_data_reduced.rda")
+#REDUCE DATA SIZE
+val_x <- unique(coords[,1])[round(seq(1, length(unique(coords[,1])), by=5))]
+val_y <- unique(coords[,2])[round(seq(1, length(unique(coords[,2])), by=4))]
+ind1 <- which(coords[,1] %in% val_x)
+ind2 <- which(coords[,2] %in% val_y)
+indx <- intersect(ind1, ind2)
+out2 <- out[,indx]
+coords2 <- coords[indx,]
+
+e <- extent(coords2)
+r <- raster(e, nrow=length(val_y), ncol=length(val_x))
+x1 <- rasterize(coords2, r, apply(out2, 2, mean))
+x2 <- rasterize(coords2, r, apply(out2, 2, sd))
+
+par(mfrow=c(1,2))
+plot(x1,
+     col=colorRampPalette((brewer.pal(11, "Blues")))(200), interpolate=TRUE)
+plot(x2,
+     col=colorRampPalette((brewer.pal(11, "Blues")))(100))
+
+
+#Construct full dataset
+
+
+for(k in 1:8){
+  data_tmp <- data.frame(surge=NULL, slr=NULL,
+                     theta=NULL, v=NULL,
+                     pmin=NULL, lat=NULL,
+                     x=NULL, y=NULL)
+  for(i in (1 + (k-1)*500):(k*500)){
+    df <- data.frame(surge=out2[i,])
+    df$slr <- rep(inputs[i,1], length(indx))
+    df$theta <- rep(inputs[i,2], length(indx))
+    df$v <- rep(inputs[i,3], length(indx))
+    df$pmin <- rep(inputs[i,4], length(indx))
+    df$lat <- rep(inputs[i,5], length(indx))
+    df$x <- coords2[,1]
+    df$y <- coords2[,2]
+    data_tmp <- rbind(data_tmp, df)
+    print(i)
+  }
+  assign(paste0("data", k), data_tmp)
+}
+
+data <- data.frame(surge=NULL, slr=NULL,
+                       theta=NULL, v=NULL,
+                       pmin=NULL, lat=NULL,
+                       x=NULL, y=NULL)
+for(k in 1:8){
+  df <- get(paste0("data", k))
+  data <- rbind(data, df)
+}
+save(data, file="surge_data_reduced_long.rda")
