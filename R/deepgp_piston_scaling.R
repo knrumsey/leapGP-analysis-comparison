@@ -40,5 +40,7 @@ lin_fit <- lm(T_vec ~ I(N_vec) + I(N_vec^2) + I(N_vec^3))
 plot(N_vec, T_vec, pch=16, cex=2)
 beta <- lin_fit$coefficients
 curve(beta[1] + beta[2]*x + beta[3]*x^2 + beta[4]*x^3, add=TRUE)
+
+#Estimate time (days) to run fit_two_layer on a N=40,000 problem
 N <- 40000
-(beta[1] + beta[2]*N + beta[3]*N^2 + beta[4]*N^3)/60/60/24/
+(beta[1] + beta[2]*N + beta[3]*N^2 + beta[4]*N^3)/60/60/24

@@ -4,7 +4,7 @@ library(quack)            # leapGP: devtools::install_github("knrumsey/quack")
 library(laGP)             # laGP
 source("R/twin_galaxies.R") # twin_galaxies function
 
-
+set.seed(11111)
 # Simulations using Twin Galaxies function
 n <- 1000
 X <- smartLHS(n, 2)

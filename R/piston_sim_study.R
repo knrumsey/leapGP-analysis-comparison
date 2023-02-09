@@ -4,13 +4,14 @@ library(stargazer)     # Latex Tables
 library(tictoc)        # Timing package
 library(RColorBrewer)  # R Colors
 library(lhs)           # Design
-library(quack)         # leapGP: devtools::github_install("knrumsey/quack")
+library(quack)         # leapGP: devtools::install_github("knrumsey/quack")
 library(laGP)          # laGP
 library(BASS)          # Bayesian MARS
 library(BART)          # bart
-library(BayesPPR)      # bppr: devtools::github_install("gqcollins/BayesPPR")
+library(BayesPPR)      # bppr: devtools::install_github("gqcollins/BayesPPR")
 library(gplite)        # FITC (inducing point GP)
 library(tgp)           # bcart
+library(GPvecchia)
 source("R/piston.R")     # piston function
 
 
@@ -27,8 +28,13 @@ X2 <- quack::smartLHS(N2, 7)
 y2 <- apply(X2, 1, piston, scale01=TRUE)
 
 # laGP and leapGP parameters
-n <- 120
-M0 <- 200
+if(N = 4000){
+  n <- M0 <- 60
+}
+if(N=40000){
+  n <- 120
+  M <- 200
+}
 
 # 1. BASS Model
 # =============================================
@@ -84,7 +90,7 @@ toc_sgp <- toc()
 
 tic()
 yht_sgp <- cov_sgp <- rep(NA, N2)
-for(i in 1:500){
+for(i in 1:1000){
   pred <- gp_pred(gp, matrix(X2[i,], nrow=1), var=TRUE)
   yht_sgp[i] <- pred$mean
   cov_sgp[i] <- (pred$mean - 1.96*sqrt(pred$var) < y2[i]) & (pred$mean + 1.96*sqrt(pred$var) > y2[i])
@@ -197,12 +203,14 @@ for(i in 1:1000){
 }
 toc_ppr2 <- toc()
 
-
-
 save(toc_bass, toc_bass2, toc_bart, toc_bart2, toc_sgp, toc_sgp2, toc_la, toc_leap, toc_leap2, toc_slap, toc_tgp, toc_tgp2, toc_ppr, toc_ppr2,
      yht_bass, yht_bart, yht_sgp, yht_la, yht_leap, yht_slap, yht_tgp, yht_ppr,
      cov_bass, cov_bart, cov_sgp, cov_la, cov_leap, cov_slap, cov_tgp, cov_ppr,
      file=paste0("Data/piston_sim_output_N", N, ".rda"))
+
+
+
+
 
 
 
@@ -277,47 +285,6 @@ save(my_tab, file=paste0("Data/my_tab_", N, ".rda"))
 sink(file=paste0("Data/table_", N, ".txt"))
 tmp = stargazer(my_tab, digits=2)
 sink()
-
-
-#MAKE FIGURES
-# =============================================
-
-# RMSPE
-png(paste0("Figures/piston_rmspe_", N, ".png"),
-    width=5, height=5.5, res=300, units="in")
-par(mar=c(9,4,2.5,2) + 0.1)
-tmp <- my_tab[,3]
-ord <- order(tmp)
-plot(1:length(tmp), tmp[ord], type='h', xaxt='n', ylab='RMSPE', xlab="", col='white',
-     xlim=c(.5, length(tmp)+0.5))
-axis(1, 1:length(tmp), rownames(my_tab)[ord], las=2)
-eps <- 0.4
-bob <- rep("black", 14)
-bob[c(7:14, 6)] <- brewer.pal(9, "Blues")
-for(i in 1:14){
-  zz <- tmp[ord[i]]
-  rect(i-eps, 0, i+eps, zz, border="black", col=adjustcolor(bob[ord[i]], 0.6), lwd=2)
-}
-dev.off()
-
-# Timing
-png(paste0("Figures/piston_timing_", N, ".png"),
-    width=5, height=5.5, res=300, units="in")
-par(mar=c(9,4,2.5,2) + 0.1)
-tmp <- my_tab[,2] + my_tab[,1]
-ord <- order(my_tab[,2])
-plot(1:length(tmp), log10(my_tab[ord,2]), type='p', xaxt='n', ylab='Time (seconds)', xlab="", col='white', xlim=c(.5, length(tmp)+0.5), yaxt='n')
-axis(1, 1:length(tmp), rownames(my_tab)[ord], las=2)
-eps <- 0.4
-bob <- rep("black", 14)
-bob[c(7:14, 6)] <- brewer.pal(9, "Blues")
-for(i in 1:14){
-  zz <- log10(my_tab[ord[i], 2])
-  rect(i-eps, log10(min(my_tab[,2])/1.1), i+eps, zz, border="black", col=adjustcolor(bob[ord[i]], 0.6), lwd=2)
-  #rect(i-eps, zz, i+eps, log(tmp[ord[i]]), border="black", lwd=2)
-}
-axis(2, pretty(range(log10(tmp)), n=4), 10^pretty(range(log10(tmp)), n=4))
-dev.off()
 
 
 
