@@ -3,7 +3,16 @@ R code for analysis of leapGP/laGP on the twin galaxies function (Rumsey et al.,
 Note that code for implementation of leapGP is maintained in the `quack` R package which can be installed via
 
 ```{R}
+# Not maintained, see update below. 
 devtools::install_github("knrumsey/quack")
+```
+
+# Update (03/01/2023)
+
+A new and "easier to use" version of the R package can be installed by typing
+```{R}
+# install.packages("devtools")
+devtools::install_github("knrumsey/leapgp")
 ```
 
 ## References
